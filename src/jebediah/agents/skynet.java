@@ -1,4 +1,4 @@
-package jebediah;
+package jebediah.agents;
 
 import aiproj.slider.Move;
 import aiproj.slider.SliderPlayer;
