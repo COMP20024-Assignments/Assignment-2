@@ -6,5 +6,6 @@ package jebediah.generic;
  * Abstract class for tile objects on the board
  */
 public abstract class Tile {
+    public char type='-';
     public abstract boolean isOccupied();
 }

@@ -4,20 +4,27 @@ package jebediah.generic;
  * Board contains all the tiles in the game, set out in an array board[x][y]
  */
 public class Board {
-    private static Tile[][] board;
-    private static int SIZE;
-    private static final int MIN_SIZE = 3;
 
-    public Board(int dimension) {
+    private Tile[][] board;
+    private int SIZE;
+
+    public Board(int dimension, String boardLayout, Agent player) {
+
+
+        int MIN_SIZE = 3;
+
         if (dimension <= MIN_SIZE) {
             System.out.println("Invalid board size, terminating");
             System.exit(1);
         }
         SIZE = dimension;
-        board = new Tile[SIZE][SIZE];
+        board = new Tile[dimension][dimension];
+
+        Agent enemy;
+
     }
 
-    public static void addTile(Tile tile, int x, int y) {
+    private void addTile(Tile tile, int x, int y) {
         if (x >= SIZE || y >= SIZE) {
             System.out.println("Out of board array bound, terminating");
             System.exit(1);
@@ -26,12 +33,49 @@ public class Board {
         board[x][y] = tile;
     }
 
-    static boolean isOccupied(int x, int y) {
+    boolean isOccupied(int x, int y) {
         return board[x][y].isOccupied();
     }
 
-    static int getSize() {
+    public int getSize() {
         return SIZE;
+    }
+
+
+    public void fillBoard(String boardLayout, Agent h, Agent v) {
+
+        for (int j=0; j < SIZE; j++) {
+            for (int i=0; i < SIZE; i++) {
+
+                switch (boardLayout.charAt(i)) {
+                    case ('B'):
+                        this.addTile(new BlockedTile(), i, j);
+                        break;
+
+                    case ('V'):
+                        v.addPiece(new Piece(i,j));
+                        this.addTile(new ValidTile(true), i, j);
+                        break;
+
+                    case ('H'):
+                        h.addPiece(new Piece(i,j));
+                        this.addTile(new ValidTile(true), i, j);
+                        break;
+
+                    case ('+'):
+                        this.addTile(new ValidTile(false), i, j);
+                        break;
+
+                    default:
+                        System.out.println("Invalid tile in board creation, terminating");
+                        System.exit(1);
+                }
+            }
+        }
+    }
+
+    public char getTileType(int x, int y) {
+        return this.board[x][y].type;
     }
 
 }

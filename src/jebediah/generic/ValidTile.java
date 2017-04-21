@@ -6,7 +6,8 @@ package jebediah.generic;
 public class ValidTile extends Tile {
     private boolean occupied;
 
-    public ValidTile(boolean containsPiece) {
+    public ValidTile(boolean containsPiece, char type) {
+        if (containsPiece) this.type = type;
         occupied = containsPiece;
     }
     @Override

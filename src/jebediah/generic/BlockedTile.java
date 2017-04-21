@@ -5,7 +5,7 @@ package jebediah.generic;
  */
 public class BlockedTile extends Tile {
 
-    public BlockedTile() {}
+    public BlockedTile() {type = 'B';}
 
     public boolean isOccupied() {
         return true;

@@ -4,7 +4,7 @@ Package layout:
 
 aiproj.slider   -   Source code for the game simulation, player interface and move helper class
 
-jebediah.       -   overall package created by thomas mile & george juliff
+jebediah.       -   overall package created by thomas miles & george juliff
 
 .agents         -   contains AI agent class "skynet" as well as a human class to assist in training & testing
 

@@ -31,32 +31,5 @@ public class TestMoves {
         System.out.println("Awaiting Input...");
         new Board(stdin.nextInt());
 
-        for (int j=Board.getSize()-1; j >= 0; j--) {
-            for (int i=0; i < Board.getSize(); i++) {
-                switch (stdin.next().charAt(0)) {
-                    case ('B'):
-                        Board.addTile(new BlockedTile(), i, j);
-                        break;
-
-                    case ('V'):
-                        v.addPiece(new Piece(i,j));
-                        Board.addTile(new ValidTile(true), i, j);
-                        break;
-
-                    case ('H'):
-                        h.addPiece(new Piece(i,j));
-                        Board.addTile(new ValidTile(true), i, j);
-                        break;
-
-                    case ('+'):
-                        Board.addTile(new ValidTile(false), i, j);
-                        break;
-
-                    default:
-                        System.out.println("Invalid tile in board creation, terminating");
-                        System.exit(1);
-                }
-            }
-        }
     }
 }
