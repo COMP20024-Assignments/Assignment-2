@@ -17,20 +17,28 @@ public class Piece {
         type = owner;
     }
 
+    void move(Move.Direction d) {
+        switch (d) {
+            case DOWN: ypos--;
+            case UP: ypos ++;
+            case LEFT: xpos --;
+            case RIGHT: xpos ++;
+        }
+    }
 
     public boolean canMove(Move.Direction move, Board board) {
         switch (move) {
             case UP:
-                return board.isOccupied(xpos, ypos + 1);
+                return (type == 'V'&& ypos+1 == board.getSize()) || !board.isOccupied(xpos, ypos + 1);
 
             case RIGHT:
-                return board.isOccupied(xpos+1, ypos);
+                return (type == 'H' && xpos+1 == board.getSize()) || !board.isOccupied(xpos + 1, ypos);
 
             case DOWN:
-                return (this.type != 'V') && board.isOccupied(xpos, ypos - 1);
+                return (this.type == 'H') && !board.isOccupied(xpos, ypos - 1);
 
             case LEFT:
-                return (this.type != 'H') && board.isOccupied(xpos-1, ypos);
+                return (this.type == 'V') && !board.isOccupied(xpos - 1, ypos);
 
             default:
                 System.out.println("Invalid direction!");
@@ -40,5 +48,27 @@ public class Piece {
     boolean posMatch(int x,int y) {
         if (x==xpos && y==ypos) return true;
         return false;
+    }
+    boolean escape(int boardSize) {
+        if (xpos >= boardSize || ypos >= boardSize) return true;
+        return false;
+    }
+
+
+    Move generateMove(Move.Direction d) {
+        // be careful to only do this if it's legal
+        Move move = new Move (xpos, ypos, d);
+
+        switch (d) {
+            case UP:
+                ypos++;
+            case DOWN:
+                ypos--;
+            case RIGHT:
+                xpos++;
+            case LEFT:
+                xpos--;
+        }
+        return move;
     }
 }

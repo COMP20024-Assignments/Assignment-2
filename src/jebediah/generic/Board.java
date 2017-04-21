@@ -1,4 +1,9 @@
 package jebediah.generic;
+
+import aiproj.slider.Move;
+
+import java.io.StringReader;
+
 /**
  * Created by Tom Miles (tmiles, 626263) and George Juliff (juliffg, 624946) on 1/04/2017.
  * Board contains all the tiles in the game, set out in an array board[x][y]
@@ -20,8 +25,6 @@ public class Board {
         SIZE = dimension;
         board = new Tile[dimension][dimension];
 
-        Agent enemy;
-
     }
 
     private void addTile(Tile tile, int x, int y) {
@@ -34,7 +37,8 @@ public class Board {
     }
 
     boolean isOccupied(int x, int y) {
-        return board[x][y].isOccupied();
+        return (x >= SIZE || y >= SIZE) || board[x][y].isOccupied();
+
     }
 
     public int getSize() {
@@ -42,40 +46,84 @@ public class Board {
     }
 
 
+
     public void fillBoard(String boardLayout, Agent h, Agent v) {
 
-        for (int j=0; j < SIZE; j++) {
+        int k = 0;
+        for (int j=SIZE-1; j >= 0; j--) {
             for (int i=0; i < SIZE; i++) {
 
-                switch (boardLayout.charAt(i)) {
-                    case ('B'):
-                        this.addTile(new BlockedTile(), i, j);
-                        break;
+                boolean registered=false;
+                while (k < boardLayout.length() && !registered) {
 
-                    case ('V'):
-                        v.addPiece(new Piece(i,j));
-                        this.addTile(new ValidTile(true), i, j);
-                        break;
+                    switch (boardLayout.charAt(k)) {
+                        case ('B'):
+                            registered = true;
+                            this.addTile(new BlockedTile(), i, j);
+                            break;
 
-                    case ('H'):
-                        h.addPiece(new Piece(i,j));
-                        this.addTile(new ValidTile(true), i, j);
-                        break;
+                        case ('V'):
+                            registered = true;
+                            v.addPiece(new Piece(i, j, 'V'));
+                            this.addTile(new ValidTile(true, 'V'), i, j);
+                            break;
 
-                    case ('+'):
-                        this.addTile(new ValidTile(false), i, j);
-                        break;
+                        case ('H'):
+                            registered = true;
+                            h.addPiece(new Piece(i, j, 'H'));
+                            this.addTile(new ValidTile(true, 'H'), i, j);
+                            break;
 
-                    default:
-                        System.out.println("Invalid tile in board creation, terminating");
-                        System.exit(1);
+                        case ('+'):
+                            registered = true;
+                            this.addTile(new ValidTile(false, '+'), i, j);
+                            break;
+                        default:
+                            registered=false;
+                    }
+               //     System.out.println("char: " +  boardLayout.charAt(k) +"\nregistered: "+registered+"\ni: "+i+"\nj: "+j+"\n\n");
+                    k++;
                 }
             }
         }
     }
 
     public char getTileType(int x, int y) {
+        if (x >= SIZE || y >= SIZE) return '*';
         return this.board[x][y].type;
     }
 
+    public void update(Move move, char player) {
+        switch (move.d) {
+            case UP:
+                board[move.i][move.j].moveOut();
+                //piece didn't move off board
+                if (!(move.j+1 >= SIZE)) {
+                    board[move.i][move.j+1].moveInto(player);
+                }
+                break;
+
+            case DOWN:
+                board[move.i][move.j].moveOut();
+                //piece didn't move off board
+                if (!(move.j-1 >= SIZE)) {
+                    board[move.i][move.j-1].moveInto(player);
+                }
+                break;
+            case LEFT:
+                board[move.i][move.j].moveOut();
+                //piece didn't move off board
+                if (!(move.i-1 >= SIZE)) {
+                    board[move.i-1][move.j].moveInto(player);
+                }
+                break;
+            case RIGHT:
+                board[move.i][move.j].moveOut();
+                //piece didn't move off board
+                if (!(move.i+1 >= SIZE)) {
+                    board[move.i+1][move.j].moveInto(player);
+                }
+                break;
+        }
+    }
 }

@@ -15,4 +15,14 @@ public class ValidTile extends Tile {
         return occupied;
     }
 
+    @Override
+    public void moveInto(char type) {
+        occupied = true;
+        this.type = type;
+    }
+    @Override
+    public void moveOut() {
+        occupied = false;
+        this.type = ' ';
+    }
 }

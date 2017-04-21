@@ -31,6 +31,15 @@ public class human implements SliderPlayer  {
      *  Updates the board after opponent has moved and prints it so human can make a decision
     **/
     public void update(Move move) {
+        System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
+        if (move == null) {
+            printBoard();
+            System.out.println("Opponent Passed");
+            return;
+        }
+        System.out.println("Your turn: "+me.player);
+        board.update(move, enemy.player);
+        printBoard();
 
     }
 
@@ -46,24 +55,32 @@ public class human implements SliderPlayer  {
         int counter = 0;
 
         Scanner s = new Scanner(System.in);
+
+
         System.out.println("Please select piece to move:  ");
 
 
         while (true) {
-            pieceIndex = s.nextInt();
-            if ((piece = me.getPiece(pieceIndex)) == null) {
-                System.out.println("invalid index, try again!");
+            try {
+                pieceIndex = s.nextInt();
+
+                if ((piece = me.getPiece(pieceIndex)) == null) {
+                    System.out.println("invalid index, try again!");
 // check if selected piece is stuck
-            } else if (piece.canMove(Move.Direction.UP, this.board) || piece.canMove(Move.Direction.DOWN, this.board) ||
-                    piece.canMove(Move.Direction.LEFT, this.board) || piece.canMove(Move.Direction.RIGHT, this.board)) {
-                break;
+                } else if (piece.canMove(Move.Direction.UP, this.board) || piece.canMove(Move.Direction.DOWN, this.board) ||
+                        piece.canMove(Move.Direction.LEFT, this.board) || piece.canMove(Move.Direction.RIGHT, this.board)) {
+                    break;
 // if all are stuck pass turn
-            } else if (counter+1 < board.getSize()){
-                counter++;
-                System.out.println("Piece is stuck, pick another, " +counter+" pieces stuck.");
-            } else {
-                System.out.println("Passing");
-                return null;
+                } else if (counter + 1 < board.getSize()) {
+                    counter++;
+                    System.out.println("Piece is stuck, pick another, " + counter + " pieces stuck.");
+                } else {
+                    System.out.println("Passing");
+                    return null;
+                }
+            } catch (Exception e){
+                System.out.println("Piece index expects int, try again");
+                s = new Scanner(System.in);
             }
         }
         System.out.println("Please select direction ('w' // 'a' // 's' // 'd'):  ");
@@ -97,11 +114,12 @@ public class human implements SliderPlayer  {
                     System.out.println("Invalid key press, controls are wasd");
                     valid = false;
             }
-            System.out.println("Unable to move, try again");
         }
-        printBoard();
+        Move move = me.makeMove(direction, pieceIndex, board.getSize());
+        board.update(move, me.player);
 
-        return me.makeMove(direction, pieceIndex);
+        return move;
+
     }
 
     /**
@@ -109,9 +127,8 @@ public class human implements SliderPlayer  {
      */
     private void printBoard() {
 
-        for (int j=board.getSize(); j > 0; j--) {
+        for (int j=board.getSize()-1; j >= 0; j--) {
             for (int i=0; i < board.getSize(); i++) {
-
                 // make sure indexes get printed for my pieces
                 if (board.getTileType(i,j) == me.player) {
                     System.out.print(" "+ me.getPieceIndex(i,j)+ " ");
@@ -120,6 +137,8 @@ public class human implements SliderPlayer  {
                 }
             }
             System.out.print("\n");
+
         }
     }
+
 }

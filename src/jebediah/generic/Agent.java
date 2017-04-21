@@ -30,14 +30,24 @@ public class Agent {
         return pieces.get(index);
     }
 
-    public Move makeMove(Move.Direction direction, int index) {
+    public Move makeMove(Move.Direction direction, int index, int boardSize) {
 
+        Move myMove = pieces.get(index).generateMove(direction);
+
+        if (pieces.get(index).escape(boardSize)) {
+            pieces.remove(index);
+        } else {
+            pieces.get(index).move(direction);
+        }
+
+        return myMove;
     }
 
     public int getPieceIndex(int x, int y) {
         for (int i=0; i < pieces.size(); i++) {
-            if (pieces.get(i).)
+            if (pieces.get(i).posMatch(x,y)) return i;
         }
+        return -1; // shouldnt get here if x and y are the coordinates for a piece I own.
     }
 /*
     int calculateNumMoves() {
