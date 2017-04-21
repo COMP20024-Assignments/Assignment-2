@@ -6,7 +6,8 @@ package jebediah.generic;
 public class ValidTile extends Tile {
     private boolean occupied;
 
-    public ValidTile(boolean containsPiece) {
+    public ValidTile(boolean containsPiece, char type) {
+        if (containsPiece) this.type = type;
         occupied = containsPiece;
     }
     @Override
@@ -14,4 +15,14 @@ public class ValidTile extends Tile {
         return occupied;
     }
 
+    @Override
+    public void moveInto(char type) {
+        occupied = true;
+        this.type = type;
+    }
+    @Override
+    public void moveOut() {
+        occupied = false;
+        this.type = ' ';
+    }
 }

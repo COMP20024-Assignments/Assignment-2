@@ -5,9 +5,18 @@ package jebediah.generic;
  */
 public class BlockedTile extends Tile {
 
-    public BlockedTile() {}
+    public BlockedTile() {type = 'B';}
 
     public boolean isOccupied() {
         return true;
+    }
+
+    public void moveInto(char type) {
+        System.out.println("cannot move here!!!");
+        System.exit(1);
+    }
+    public void moveOut() {
+        System.out.println("cannot move out of here!!!");
+        System.exit(1);
     }
 }
