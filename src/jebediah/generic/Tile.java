@@ -1,9 +1,11 @@
 package jebediah.generic;
 
-/**
- * Created by Tom Miles (tmiles, 626263) and George Juliff (juliffg, 624946) on 1/04/2017.
- *
- * Abstract class for tile objects on the board
+/** COMP30024 Artificial Intelligence
+ Tile class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ abstract class extended by all types of tile
  */
 public abstract class Tile {
     public char type=' ';

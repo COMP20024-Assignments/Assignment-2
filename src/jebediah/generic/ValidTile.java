@@ -1,7 +1,10 @@
 package jebediah.generic;
-/**
- * Created by Tom Miles (tmiles, 626263) and George Juliff (juliffg, 624946) on 1/04/2017.
- * Tile that can be moved into if occupied == false
+/** COMP30024 Artificial Intelligence
+ ValidTile class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ Represents standard game tiles, and keeps track of if it is occupied or not.
  */
 public class ValidTile extends Tile {
     private boolean occupied;

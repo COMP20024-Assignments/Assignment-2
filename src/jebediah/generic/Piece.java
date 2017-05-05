@@ -2,10 +2,12 @@ package jebediah.generic;
 
 import aiproj.slider.Move;
 
-/**
- * Created by Tom Miles on 1/04/2017.
- *
- * Pieces belong to Agents, currently only have the ability to check if they can move in a given direction.
+/** COMP30024 Artificial Intelligence
+ Piece class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ Belong to a given agent and represent their game pieces on the board, recording their position
  */
 public class Piece {
     private int xpos, ypos;
@@ -20,9 +22,17 @@ public class Piece {
     void move(Move.Direction d) {
         switch (d) {
             case DOWN: ypos--;
+                break;
+
             case UP: ypos ++;
+                break;
+
             case LEFT: xpos --;
+                break;
+
             case RIGHT: xpos ++;
+                break;
+
         }
     }
 
@@ -71,4 +81,7 @@ public class Piece {
         }
         return move;
     }
+
+    public int getXpos() {return xpos;}
+    public int getYpos() {return ypos;}
 }

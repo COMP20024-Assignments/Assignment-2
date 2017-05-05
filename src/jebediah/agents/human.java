@@ -4,8 +4,12 @@ import java.util.Scanner;
 import aiproj.slider.Move;
 import aiproj.slider.SliderPlayer;
 import jebediah.generic.*;
-/**
- * Created by Tom Miles on 21/04/2017.
+/** COMP30024 Artificial Intelligence
+ human class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ A class that can be used to allow a human to play the slider game in order to assist in training the AI
  */
 public class human implements SliderPlayer  {
 
@@ -15,7 +19,7 @@ public class human implements SliderPlayer  {
 
     public void init(int dimension, String boardLayout, char player) {
         me = new Agent(player);
-        board = new Board(dimension, boardLayout, me);
+        board = new Board(dimension);
 
         if (player == 'H') {
             enemy = new Agent('V');

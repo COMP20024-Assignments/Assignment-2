@@ -4,21 +4,24 @@ import aiproj.slider.Move;
 
 import java.io.StringReader;
 
-/**
- * Created by Tom Miles (tmiles, 626263) and George Juliff (juliffg, 624946) on 1/04/2017.
- * Board contains all the tiles in the game, set out in an array board[x][y]
+/** COMP30024 Artificial Intelligence
+ Board class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ Contains all the tiles of the game in a grid, and keeps track of if they are full, empty or blocked
  */
 public class Board {
 
     private Tile[][] board;
     private int SIZE;
 
-    public Board(int dimension, String boardLayout, Agent player) {
+    public Board(int dimension) {
 
 
         int MIN_SIZE = 3;
 
-        if (dimension <= MIN_SIZE) {
+        if (dimension < MIN_SIZE) {
             System.out.println("Invalid board size, terminating");
             System.exit(1);
         }
@@ -37,7 +40,7 @@ public class Board {
     }
 
     boolean isOccupied(int x, int y) {
-        return (x >= SIZE || y >= SIZE) || board[x][y].isOccupied();
+        return (x >= SIZE || y >= SIZE) || x < 0 || y < 0 || board[x][y].isOccupied();
 
     }
 
@@ -88,6 +91,36 @@ public class Board {
         }
     }
 
+    public void fillBoard(char[][] boardLayout, Agent h, Agent v) {
+
+        for (int j=0; j < SIZE; j++) {
+            for (int i=0; i < SIZE; i++) {
+                switch (boardLayout[i][j]) {
+                        case ('B'):
+                            this.addTile(new BlockedTile(), i, j);
+                            break;
+
+                        case ('V'):
+                            v.addPiece(new Piece(i, j, 'V'));
+                            this.addTile(new ValidTile(true, 'V'), i, j);
+                            break;
+
+                        case ('H'):
+                            h.addPiece(new Piece(i, j, 'H'));
+                            this.addTile(new ValidTile(true, 'H'), i, j);
+                            break;
+
+                        case (' '):
+                            this.addTile(new ValidTile(false, '+'), i, j);
+                            break;
+                        default:
+                            System.out.println("Error: invalid char in board array: '" + boardLayout[i][j] + "'");
+                            System.exit(1);
+                }
+            }
+        }
+    }
+
     public char getTileType(int x, int y) {
         if (x >= SIZE || y >= SIZE) return '*';
         return this.board[x][y].type;
@@ -125,5 +158,32 @@ public class Board {
                 }
                 break;
         }
+    }
+
+    @Override
+    public String toString() {
+        String string = "";
+        int x, y;
+        for (y = 0; y < SIZE; y++) {
+            for (x = 0; x < SIZE; x++) {
+               if (x+1 < SIZE) {
+                   string += board[x][y].type + " ";
+               } else {
+                   string += board[x][y].type + "/n";
+               }
+            }
+        }
+        return string;
+    }
+
+    public char[][] toArray() {
+        char[][] out = new char[SIZE][SIZE];
+        int i, j;
+        for (j = 0; j < SIZE; j++) {
+            for (i = 0; i < SIZE; i++) {
+                out[i][j] = board[i][j].type;
+            }
+        }
+        return out;
     }
 }

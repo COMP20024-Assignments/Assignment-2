@@ -3,11 +3,12 @@ import aiproj.slider.Move;
 
 import java.util.ArrayList;
 
-/**
- * Created by Tom Miles (tmiles, 626263) and George Juliff (juliffg, 624946) on 1/04/2017.
- *
- * Agent class represents a player of the game. Agents have pieces which are initialised when the board is created.
- *
+/** COMP30024 Artificial Intelligence
+ Agent class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ the agent represents a player of the game and keeps track of the necessary pieces
  */
 public class Agent {
     private ArrayList<Piece> pieces;
