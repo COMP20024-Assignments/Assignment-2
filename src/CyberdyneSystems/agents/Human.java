@@ -1,35 +1,26 @@
-package jebediah.agents;
+
+package CyberdyneSystems.agents;
 
 import java.util.Scanner;
 import aiproj.slider.Move;
-import aiproj.slider.SliderPlayer;
-import jebediah.generic.*;
-/**
- * Created by Tom Miles on 21/04/2017.
+import CyberdyneSystems.generic.*;
+
+import static CyberdyneSystems.generic.Board.O;
+
+/** COMP30024 Artificial Intelligence
+ Human class
+ George Juliff - 624946
+ Thomas Miles - 626263
+
+ A class that can be used to allow a Human to play the slider game in order to assist in testing and training the AI
  */
-public class human implements SliderPlayer  {
+public class Human extends Agent  {
 
-    private Agent me;
-    private Agent enemy;
-    private Board board;
-
-    public void init(int dimension, String boardLayout, char player) {
-        me = new Agent(player);
-        board = new Board(dimension, boardLayout, me);
-
-        if (player == 'H') {
-            enemy = new Agent('V');
-            board.fillBoard(boardLayout, me, enemy);
-        }
-        else {
-            enemy = new Agent('H');
-            board.fillBoard(boardLayout, enemy, me);
-        }
-    }
 
     /**
-     *  Updates the board after opponent has moved and prints it so human can make a decision
-    **/
+     *  Updates the board after opponent has moved and prints it so Human can make a decision
+     **/
+    @Override
     public void update(Move move) {
         System.out.println("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n");
         if (move == null) {
@@ -49,9 +40,9 @@ public class human implements SliderPlayer  {
      */
     public Move move() {
 
+        byte[] piece;
         int pieceIndex;
         Move.Direction direction = null;
-        Piece piece;
         int counter = 0;
 
         Scanner s = new Scanner(System.in);
@@ -67,8 +58,12 @@ public class human implements SliderPlayer  {
                 if ((piece = me.getPiece(pieceIndex)) == null) {
                     System.out.println("invalid index, try again!");
 // check if selected piece is stuck
-                } else if (piece.canMove(Move.Direction.UP, this.board) || piece.canMove(Move.Direction.DOWN, this.board) ||
-                        piece.canMove(Move.Direction.LEFT, this.board) || piece.canMove(Move.Direction.RIGHT, this.board)) {
+                } else if (
+                        (((me.player == Board.V) && (piece[1]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O ) || // UP
+                                ((me.player == Board.H) && (piece[1]-1 >=0) && (board.board[piece[0]][piece[1]-1] == O)) || // DOWN
+                                ((me.player == Board.V) && (piece[0]-1 >=0) && (board.board[piece[0]-1][piece[1]] == O)) || // LEFT
+                                (((me.player == Board.H) && (piece[0]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O )) // RIGHT
+                {
                     break;
 // if all are stuck pass turn
                 } else if (counter + 1 < board.getSize()) {
@@ -93,33 +88,32 @@ public class human implements SliderPlayer  {
                 // move made
                 case 'w':
                     direction = Move.Direction.UP;
-                    valid = piece.canMove(direction, this.board);
+                    valid = (((me.player == Board.V) && (piece[1]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O );
                     break;
 
                 case 'a':
                     direction = Move.Direction.LEFT;
-                    valid = piece.canMove(direction, this.board);
+                    valid = ((me.player == Board.V) && (piece[0]-1 >=0) && (board.board[piece[0]-1][piece[1]] == O));
                     break;
 
                 case 's':
                     direction = Move.Direction.DOWN;
-                    valid = piece.canMove(direction, this.board);
+                    valid = ((me.player == Board.H) && (piece[1]-1 >=0) && (board.board[piece[0]][piece[1]-1] == O));
                     break;
 
                 case 'd':
                     direction = Move.Direction.RIGHT;
-                    valid = piece.canMove(direction, this.board);
+                    valid = (((me.player == Board.H) && (piece[0]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O );
                     break;
                 default:
                     System.out.println("Invalid key press, controls are wasd");
                     valid = false;
             }
         }
-        Move move = me.makeMove(direction, pieceIndex, board.getSize());
+        Move move = me.makeMove(direction, pieceIndex);
         board.update(move, me.player);
 
         return move;
-
     }
 
     /**
