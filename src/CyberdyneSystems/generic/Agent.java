@@ -1,7 +1,9 @@
 
 package CyberdyneSystems.generic;
+
 import aiproj.slider.Move;
 import aiproj.slider.SliderPlayer;
+
 import java.util.ArrayList;
 
 /** COMP30024 Artificial Intelligence
@@ -14,13 +16,13 @@ import java.util.ArrayList;
  */
 public class Agent implements SliderPlayer {
 
+
     public final static int i = 0;
     public final static int j = 1;
 
-    protected Agent me;
-    protected Agent enemy;
+    public Agent enemy;
     public Board board;
-    protected ArrayList<byte[]> pieces;
+    ArrayList<byte[]> pieces;
 
     public byte player; // player type, either "horizontal" or "vertical"
 
@@ -30,7 +32,6 @@ public class Agent implements SliderPlayer {
 
     public void init(int dimension, String boardLayout, char player) {
 
-        me = new Agent();
         enemy = new Agent();
         if (player == 'H') {
             this.player = Board.H;
@@ -41,17 +42,19 @@ public class Agent implements SliderPlayer {
         }
 
         enemy = new Agent();
-        board = new Board(dimension, boardLayout, me, enemy);
+        board = new Board(dimension, boardLayout, this, enemy);
+
     }
-    public void giveBoard(byte[][] state, byte size) {
-        board = new Board(state, size);
+    public void giveBoard(byte[][] state) {
+
+        board = new Board(state);
     }
 
     public void givePieces() {
-        for (byte i=0; i<board.getSize(); i++) {
-            for (byte j=0; j<board.getSize(); j++) {
-                if (board.board[i][j] == player) {
-                    addPiece(i, j);
+        for (int i=0; i<Board.getSize(); i++) {
+            for (int j=0; j<Board.getSize(); j++) {
+                if (board.layout[i][j] == player) {
+                    addPiece((byte)i, (byte) j);
                 }
             }
         }
@@ -62,7 +65,7 @@ public class Agent implements SliderPlayer {
         return pieces.size();
     }
 
-    void addPiece(byte x, byte y) {
+    private void addPiece(byte x, byte y) {
 
         byte p[] = new byte[2];
         p[i] = x;
@@ -78,11 +81,10 @@ public class Agent implements SliderPlayer {
 
     public Move makeMove(Move.Direction direction, int index) {
 
-
         // be careful to only do this if it's legal
         Move myMove = new Move(pieces.get(index)[i], pieces.get(index)[j], direction);
 
-        if (pieces.get(index)[i] == board.getSize() || pieces.get(index)[j] == board.getSize()) {
+        if (pieces.get(index)[i] == Board.getSize() || pieces.get(index)[j] == Board.getSize()) {
             pieces.remove(index);
 
         } else {
@@ -97,10 +99,11 @@ public class Agent implements SliderPlayer {
                     pieces.get(index)[i]--;
             }
         }
+        board.update(myMove, player);
         return myMove;
     }
 
-    public int getPieceIndex(int x, int y) {
+    protected int getPieceIndex(int x, int y) {
         for (int i = 0; i < pieces.size(); i++) {
             if (pieces.get(i)[i] == x && pieces.get(i)[j] == y) return i;
         }

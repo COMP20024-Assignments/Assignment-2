@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+
+    <depthConfig>
+        <min> 3 </min>
+        <max> 100 </max>
+        <heapSize> 1000 </heapSize>
+    </depthConfig>
+
+    <heuristicConfig>
+        <forwardness>
+            <agent> 2.0 </agent>
+            <opponent> 1.0 </opponent>
+        </forwardness>
+
+        <blockedness>
+            <agent> 1.5 </agent>
+            <opponent> 0.75 </opponent>
+            <fwdMultiplier> 2.0 </fwdMultiplier>
+        </blockedness>
+
+        <emptyness>
+            <agent> 10.0 </agent>
+            <opponent> 10.0 </opponent>
+        </emptyness>
+
+        <firstMove>
+            <agent> 1 </agent>
+            <opponent> 0.5 </opponent>
+        </firstMove>
+    </heuristicConfig>
+
+</config>

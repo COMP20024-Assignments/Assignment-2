@@ -12,13 +12,13 @@ import static CyberdyneSystems.generic.Board.O;
  George Juliff - 624946
  Thomas Miles - 626263
 
- A class that can be used to allow a Human to play the slider game in order to assist in testing and training the AI
+ A class that can be used to allow a Human to play the aiproj.slider game in order to assist in testing and training the AI
  */
 public class Human extends Agent  {
 
 
     /**
-     *  Updates the board after opponent has moved and prints it so Human can make a decision
+     *  Updates the layout after opponent has moved and prints it so Human can make a decision
      **/
     @Override
     public void update(Move move) {
@@ -28,7 +28,7 @@ public class Human extends Agent  {
             System.out.println("Opponent Passed");
             return;
         }
-        System.out.println("Your turn: "+me.player);
+        System.out.println("Your turn: "+player);
         board.update(move, enemy.player);
         printBoard();
 
@@ -55,18 +55,18 @@ public class Human extends Agent  {
             try {
                 pieceIndex = s.nextInt();
 
-                if ((piece = me.getPiece(pieceIndex)) == null) {
+                if ((piece = getPiece(pieceIndex)) == null) {
                     System.out.println("invalid index, try again!");
 // check if selected piece is stuck
                 } else if (
-                        (((me.player == Board.V) && (piece[1]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O ) || // UP
-                                ((me.player == Board.H) && (piece[1]-1 >=0) && (board.board[piece[0]][piece[1]-1] == O)) || // DOWN
-                                ((me.player == Board.V) && (piece[0]-1 >=0) && (board.board[piece[0]-1][piece[1]] == O)) || // LEFT
-                                (((me.player == Board.H) && (piece[0]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O )) // RIGHT
+                        (((player == Board.V) && (piece[1]+1 == Board.getSize()))) || (board.layout[piece[0]][piece[1]+1] == O ) || // UP
+                                ((player == Board.H) && (piece[1]-1 >=0) && (board.layout[piece[0]][piece[1]-1] == O)) || // DOWN
+                                ((player == Board.V) && (piece[0]-1 >=0) && (board.layout[piece[0]-1][piece[1]] == O)) || // LEFT
+                                (((player == Board.H) && (piece[0]+1 == Board.getSize()))) || (board.layout[piece[0]][piece[1]+1] == O )) // RIGHT
                 {
                     break;
 // if all are stuck pass turn
-                } else if (counter + 1 < board.getSize()) {
+                } else if (counter + 1 < Board.getSize()) {
                     counter++;
                     System.out.println("Piece is stuck, pick another, " + counter + " pieces stuck.");
                 } else {
@@ -84,50 +84,50 @@ public class Human extends Agent  {
         while (!valid) {
 
             switch (s.next().charAt(0)) {
-                // if the move requested is valid, break the loop, make the move on our record of board and return the
+                // if the move requested is valid, break the loop, make the move on our record of layout and return the
                 // move made
                 case 'w':
                     direction = Move.Direction.UP;
-                    valid = (((me.player == Board.V) && (piece[1]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O );
+                    valid = (((player == Board.V) && (piece[1]+1 == Board.getSize()))) || (board.layout[piece[0]][piece[1]+1] == O );
                     break;
 
                 case 'a':
                     direction = Move.Direction.LEFT;
-                    valid = ((me.player == Board.V) && (piece[0]-1 >=0) && (board.board[piece[0]-1][piece[1]] == O));
+                    valid = ((player == Board.V) && (piece[0]-1 >=0) && (board.layout[piece[0]-1][piece[1]] == O));
                     break;
 
                 case 's':
                     direction = Move.Direction.DOWN;
-                    valid = ((me.player == Board.H) && (piece[1]-1 >=0) && (board.board[piece[0]][piece[1]-1] == O));
+                    valid = ((player == Board.H) && (piece[1]-1 >=0) && (board.layout[piece[0]][piece[1]-1] == O));
                     break;
 
                 case 'd':
                     direction = Move.Direction.RIGHT;
-                    valid = (((me.player == Board.H) && (piece[0]+1 == board.getSize()))) || (board.board[piece[0]][piece[1]+1] == O );
+                    valid = (((player == Board.H) && (piece[0]+1 == Board.getSize()))) || (board.layout[piece[0]][piece[1]+1] == O );
                     break;
                 default:
                     System.out.println("Invalid key press, controls are wasd");
                     valid = false;
             }
         }
-        Move move = me.makeMove(direction, pieceIndex);
-        board.update(move, me.player);
+        Move move = makeMove(direction, pieceIndex);
+        board.update(move, player);
 
         return move;
     }
 
     /**
-     * prints the board with players tiles as index values for ease of control
+     * prints the layout with players tiles as index values for ease of control
      */
     private void printBoard() {
 
-        for (int j=board.getSize()-1; j >= 0; j--) {
-            for (int i=0; i < board.getSize(); i++) {
+        for (int j=Board.getSize()-1; j >= 0; j--) {
+            for (int i=0; i < Board.getSize(); i++) {
                 // make sure indexes get printed for my pieces
-                if (board.getTileType(i,j) == me.player) {
-                    System.out.print(" "+ me.getPieceIndex(i,j)+ " ");
+                if (board.layout[i][j] == player) {
+                    System.out.print(" "+ getPieceIndex(i,j)+ " ");
                 } else {
-                    System.out.print(" "+ board.getTileType(i,j)+ " ");
+                    System.out.print(" "+ board.layout[i][j]+ " ");
                 }
             }
             System.out.print("\n");

@@ -1,17 +1,16 @@
 
-package CyberdyneSystems.agents;
+package CyberdyneSystems.AI;
 
 import aiproj.slider.Move;
 import CyberdyneSystems.generic.Agent;
 import CyberdyneSystems.generic.Board;
-import CyberdyneSystems.generic.Piece;
 
 /** COMP30024 Artificial Intelligence
 
  George Juliff - 624946
  Thomas Miles - 626263
 
- A class solely responsible for calculating the evaluation value if a given board state for a given agent.
+ A class solely responsible for calculating the evaluation value if a given layout state for a given agent.
  It contains several weighting values for various heuristic components that can be changed by machine learning code.
 
 
@@ -19,7 +18,8 @@ import CyberdyneSystems.generic.Piece;
  */
 public class Skynet {
 
-    private static final Skynet INSTANCE = new Skynet(2,1,1.5f,0.75f, 2,10,10,1,0.5f);
+    private static final Skynet INSTANCE =
+            new Skynet(2,1,1.5f,0.75f, 2,10,10,1,0.5f);
 
     private static float W1, W1_e, W2, W2_e, W2x, W3, W3_e, W4f,W4n, W4f_e,W4n_e;
 
@@ -61,7 +61,6 @@ public class Skynet {
      * @return
      */
     public float evaluate(Move firstMove, Agent me, Agent enemy) {
-
         float e1, e1e, e2, e2e, e3, e3e, e4;
 
         e1  = E1(me);
@@ -71,13 +70,13 @@ public class Skynet {
         e3  = E3(me);
         e3e = E3(enemy);
         e4 = E4(firstMove, me);
-
+        float E= W1*e1 - W1_e*e1e - W2*e2 + W2_e*e2e  + W3*e3 - W3_e*e3e + e4;
         return W1*e1 - W1_e*e1e - W2*e2 + W2_e*e2e  + W3*e3 - W3_e*e3e + e4;
     }
 
     /**
      * Sums how far forward all the pieces are. High is good.
-     * @return the total number of moves the pieces will need if the move in a straight line to the end of the board
+     * @return the total number of moves the pieces will need if the move in a straight line to the end of the layout
      */
     private static float E1(Agent agent) {
         float E=0;
@@ -102,9 +101,10 @@ public class Skynet {
         int i;
 
         for (i=0;i<agent.numPieces(); i++) {
+
             // both players can move right and up
             // check the tile to the right of each piece, if it isn't open add to E
-            if (agent.board.board [agent.getPiece(i)[Agent.i+1]] [agent.getPiece(i)[Agent.j]] != Board.O) {
+            if (agent.board.canMoveTo(agent.getPiece(i)[Agent.i] + 1, agent.getPiece(i)[Agent.j], agent.player)) {
                 // if this is a forward block
                 if (agent.player == Board.H) {
                     E += W2x;
@@ -113,7 +113,7 @@ public class Skynet {
                 }
             }
             // same deal up
-            if (agent.board.board [agent.getPiece(i)[Agent.i]] [agent.getPiece(i)[Agent.j+1]] != Board.O) {
+            if (agent.board.canMoveTo(agent.getPiece(i)[Agent.i], agent.getPiece(i)[Agent.j] + 1, agent.player)) {
                 if (agent.player == Board.V) {
                     E += W2x;
                 } else {
@@ -122,13 +122,13 @@ public class Skynet {
             }
             // only H can move down
             if (agent.player == Board.H) {
-                if (agent.board.board [agent.getPiece(i)[Agent.i]] [agent.getPiece(i)[Agent.j]-1] != Board.O) {
+                if ((agent.board.canMoveTo(agent.getPiece(i)[Agent.i], agent.getPiece(i)[Agent.j - 1], agent.player))) {
                     E++;
                 }
             }
             // and only V can move left
             if (agent.player == Board.V) {
-                if (agent.board.board [agent.getPiece(i)[Agent.i]-1] [agent.getPiece(i)[Agent.j]] != Board.O) {
+                if (agent.board.canMoveTo(agent.getPiece(i)[Agent.i] - 1, agent.getPiece(i)[Agent.j], agent.player)) {
                     E++;
                 }
             }
@@ -145,7 +145,7 @@ public class Skynet {
 
     /**
      * Returns the adjusted value of the first move
-     * @param firstMove the first move taken from the real current board state
+     * @param firstMove the first move taken from the real current layout state
      * @param player the agent object being inspected
      */
     private static float E4(Move firstMove, Agent player) {

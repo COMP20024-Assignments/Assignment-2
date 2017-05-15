@@ -21,7 +21,7 @@ public class Move {
      * Move.Direction.UP, Move.Direction.LEFT, etc. */
     public enum Direction { UP, DOWN, LEFT, RIGHT }
 
-    /** The board position to which this move applies. For detailed information
+    /** The layout position to which this move applies. For detailed information
      * about the coordinate system, see the Rules of the Game specification */
     public final int i, j;
     /** The direction in which the piece is to be moved by this move. */

@@ -1,6 +1,8 @@
 
 package CyberdyneSystems.agents;
 
+import CyberdyneSystems.AI.Node;
+import CyberdyneSystems.AI.Skynet;
 import CyberdyneSystems.generic.Agent;
 import aiproj.slider.Move;
 
@@ -9,15 +11,24 @@ import aiproj.slider.Move;
  George Juliff - 624946
  Thomas Miles - 626263
 
- AI agent for slider game. Uses iterative deepening minimax with alpha-beta pruning. (may be sent back in time to kill
+ AI agent for aiproj.slider game. Uses iterative deepening minimax with alpha-beta pruning. (may be sent back in time to kill
  Sarah Connor before she gives birth to the leader of the human resistance)
  */
 public class T800 extends Agent {
 
     private int depth=3; // initial value for max depth, move uses iterative deepening to maximise this
-    private int depthBound=100; // when to stop iterative deepening if no OutOfMemoryError occurs
+    private int depthBound=3; // when to stop iterative deepening if no OutOfMemoryError occurs
     private Move bestMove = null;
     private float bestScore = -Float.MAX_VALUE;
+
+    /**
+     * initialize T-800 in the same way as the generic agent class, also load the weighting values from the config file
+     */
+    @Override
+    public void init(int dimension, String boardLayout, char player) {
+        super.init (dimension, boardLayout, player);
+ //       loadConfig("CyberdyneSystems/AI/config.xml");
+    }
 
     @Override
     public void update(Move move) {
@@ -40,7 +51,7 @@ public class T800 extends Agent {
      */
     public Move move() {
 
-        Node root = new Node(me);
+        Node root = new Node(this, null);
 
         while (depth <= depthBound) {
             try {
@@ -84,12 +95,8 @@ public class T800 extends Agent {
 
         // maximum depth or terminal node reached
         if (depthRemaining == 0 || node.calculateNumMoves() == 0) {
-            // since the evaluation fns require enemy and AI agents to evaluate the board, and these swap in nodes,
+            // since the evaluation fns require enemy and AI agents to evaluate the layout, and these swap in nodes,
             // make evaluate is called correctly.
-            /*
-            *   May like to revisit the way this is done so nodes just know me and enemy agents and just have a boolean
-            *   max.. kind of a screw up...
-            */
 
             if (maximise) {
                 return Skynet.getSkynet().evaluate(firstMove, node.playerState, node.otherAgent);
@@ -99,37 +106,52 @@ public class T800 extends Agent {
         }
         if (maximise) {
             value = -Float.MAX_VALUE;
-            while ((child = node.nextChild()) != null) {
+            while (node.moreChilds()) {
+                child = node.nextChild(firstMove);
                 // this is the first move, store that and pass down recursion so we can recover the best move
-                if (firstMove == null) {
-                    firstMove = child.moveToArrive;
-                }
+
                 value = Math.max(value, alphaBeta(child, depthRemaining-1, a, b, false, firstMove));
                 alpha = Math.max(alpha, value);
 
                 if (beta <= alpha) break;
             }
 
-            // if this node is the child of the root and evaluation value is better than the bestScore found so far,
-            // update bestMove to the move taken to get to this node, once complete this will mean bestMove is the
-            // minimaxed option.
-
-
-            if (value > bestScore && depthRemaining == depthBound - 1) { /* this logic is sketchy maybe idk..... */
-                bestMove = firstMove;
+            if (depthRemaining == depthBound-1) {
+                System.out.println("first child of root");
+                if (value > bestScore) {
+                    System.out.println("value" +value);System.out.println("bestscore" +bestScore);
+                    bestMove = node.firstMove;
+                    bestScore = value;
+                }
             }
             return value;
 
         } else {
             value = Float.MAX_VALUE;
-            while ((child = node.nextChild()) != null) {
-                value = Math.min(value, alphaBeta(child, depthRemaining-1, a, b, true,firstMove));
-                beta = Math.min(beta, value);
 
+            while (node.moreChilds()) {
+
+                child = node.nextChild(firstMove);
+
+                value = Math.min(value, alphaBeta(child, depthRemaining-1, a, b, true, firstMove));
+                beta = Math.min(beta, value);
                 if (beta <= alpha) break;
+            }
+            if (depthRemaining == depthBound-1) {
+                System.out.println("first child of root");
+                if (value > bestScore) {
+                    System.out.println("value" +value);System.out.println("bestscore" +bestScore);
+                    bestMove = node.firstMove;
+                    bestScore = value;
+                }
             }
             return value;
         }
+    }
+    private void loadConfig(String filePath) {
+
 
     }
+
+
 }
