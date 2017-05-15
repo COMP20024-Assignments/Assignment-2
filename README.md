@@ -1,6 +1,6 @@
 # Assignment-2
 Winning the game
-This branch has not been bug tested but has no IDE errors.
+This branch has not been fully bug tested but has no IDE errors.
 
 Board and pieces are stored as 'byte' to save memory. Changed the package structure a bit as follows:
 
