@@ -70,7 +70,7 @@ public class Referee {
         while (!board.finished()) {
 
             // delay
-            sleep(options.delay);
+          //  sleep(options.delay);
 
             // calculate and time move
             timer.start();

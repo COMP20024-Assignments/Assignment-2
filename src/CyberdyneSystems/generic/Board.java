@@ -53,7 +53,6 @@ public class Board {
      * Constructor for creating layout from a given byte array
      *
      * @param copy array to be copied
-     * @param size size of array
      */
     Board(byte[][] copy) {
         layout = new byte[SIZE][SIZE];
@@ -74,7 +73,7 @@ public class Board {
      */
     public boolean canMoveTo(int x, int y, byte player) {
 
-        return (x == SIZE && player == H) || (y == SIZE && player == V) || x < SIZE && y < SIZE && x >=0 && y >= 0 && layout[x][y] == O;
+        return (x == SIZE && player == H) || (y == SIZE && player == V) || (x < SIZE && y < SIZE && x >=0 && y >= 0 && layout[x][y] == O);
     }
 
 
@@ -153,7 +152,7 @@ public class Board {
                     }
                     // move was illegal, this shouldn't happen (chance this to an exception)
                 } else {
-                    System.out.println("ERROR: Illegal move");
+     //               System.out.println("ERROR: Illegal move");
                     // System.exit(1);
                 }
                 break;
@@ -167,7 +166,7 @@ public class Board {
 
                     // move was illegal, this shouldn't happen (chance this to an exception)
                 } else {
-                    System.out.println("ERROR: Illegal move");
+     //               System.out.println("ERROR: Illegal move");
                     //  System.exit(1);
                 }
                 break;
@@ -181,7 +180,7 @@ public class Board {
 
                     // move was illegal, this shouldn't happen (chance this to an exception)
                 } else {
-                    System.out.println("ERROR: Illegal move");
+     //               System.out.println("ERROR: Illegal move");
                     //   System.exit(1);
                 }
                 break;
@@ -198,18 +197,19 @@ public class Board {
                     }
                     // move was illegal, this shouldn't happen (chance this to an exception)
                 } else {
-                    System.out.println("ERROR: Illegal move" );
+       //             System.out.println("ERROR: Illegal move" );
                     //   System.exit(1);
                 }
                 break;
         }
     }
-    private void printLayout() {
+    public void printLayout() {
         for (int j=SIZE-1; j>=0;j--) {
             for (int i=0; i<SIZE; i++) {
-                System.out.print(layout[i][j]+ " ");
+                System.out.print(layout[i][j]+" ");
             }
             System.out.println();
         }
+        System.out.println();
     }
 }

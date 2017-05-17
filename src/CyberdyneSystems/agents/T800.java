@@ -1,9 +1,11 @@
 
 package CyberdyneSystems.agents;
 
+import CyberdyneSystems.AI.Config;
 import CyberdyneSystems.AI.Node;
 import CyberdyneSystems.AI.Skynet;
 import CyberdyneSystems.generic.Agent;
+import CyberdyneSystems.generic.Board;
 import aiproj.slider.Move;
 
 /** COMP30024 Artificial Intelligence
@@ -16,8 +18,9 @@ import aiproj.slider.Move;
  */
 public class T800 extends Agent {
 
-    private int depth=3; // initial value for max depth, move uses iterative deepening to maximise this
-    private int depthBound=3; // when to stop iterative deepening if no OutOfMemoryError occurs
+    public static int expanded=0;
+    public static int prunes=0;
+
     private Move bestMove = null;
     private float bestScore = -Float.MAX_VALUE;
 
@@ -27,7 +30,7 @@ public class T800 extends Agent {
     @Override
     public void init(int dimension, String boardLayout, char player) {
         super.init (dimension, boardLayout, player);
- //       loadConfig("CyberdyneSystems/AI/config.xml");
+        new Config();
     }
 
     @Override
@@ -40,9 +43,16 @@ public class T800 extends Agent {
         */
 
         if (move != null) {
-            board.update(move, enemy.player);
+            if (player == Board.H) {
+                board.update(move, Board.V);
+            } else {
+                board.update(move, Board.H);
+            }
         }
         bestScore = -Float.MAX_VALUE;   // reset best score
+        bestMove = null;
+
+
     }
 
     /**
@@ -51,29 +61,27 @@ public class T800 extends Agent {
      */
     public Move move() {
 
-        Node root = new Node(this, null);
+        int depth = Config.getDepthInit();
 
-        while (depth <= depthBound) {
+        while (depth <= Config.getDepthCutoff()) {
             try {
+                Node root = new Node(this, null);
                 alphaBeta(root, depth, -Float.MAX_VALUE, Float.MAX_VALUE, true, null);
-                depth ++;
-            } catch (OutOfMemoryError e) {
-                // update the depthBound so future errors wont occur
-                depthBound = depth-1;
+                depth++;
 
-/*
-*   debug printout, machine learning will be used to find a better bound if this is inconsistent
-*/
-                System.out.printf("depthBound has changed to: "+depthBound);
+            } catch (OutOfMemoryError e) {
+                return bestMove;
             }
         }
-        if (bestMove == null) { System.out.println("Warning: null move returned"); }
+        if (bestMove != null) {
+            board.update(bestMove, player);
+            movePiece(bestMove);
+        }
+        expanded=0;
+        prunes=0;
+
         return bestMove;
     }
-
-
-
-
 
 
 
@@ -90,39 +98,38 @@ public class T800 extends Agent {
      */
     private float alphaBeta(Node node, int depthRemaining, float a, float b, boolean maximise, Move firstMove) {
 
+
         Node child;
-        float alpha = a, beta = b, value;
+        float alpha = a;
+        float beta = b;
+        float value;
 
         // maximum depth or terminal node reached
         if (depthRemaining == 0 || node.calculateNumMoves() == 0) {
+
             // since the evaluation fns require enemy and AI agents to evaluate the layout, and these swap in nodes,
             // make evaluate is called correctly.
-
             if (maximise) {
-                return Skynet.getSkynet().evaluate(firstMove, node.playerState, node.otherAgent);
+                return Skynet.evaluate(firstMove, node.playerState, node.otherAgent);
             } else {
-                return Skynet.getSkynet().evaluate(firstMove, node.otherAgent, node.playerState);
+                return Skynet.evaluate(firstMove, node.otherAgent, node.playerState);
             }
         }
         if (maximise) {
             value = -Float.MAX_VALUE;
             while (node.moreChilds()) {
-                child = node.nextChild(firstMove);
+
+                child = node.nextChild(node.firstMove);
                 // this is the first move, store that and pass down recursion so we can recover the best move
 
-                value = Math.max(value, alphaBeta(child, depthRemaining-1, a, b, false, firstMove));
+                value = Math.max(value, alphaBeta(child, depthRemaining-1, alpha, beta, false, firstMove));
                 alpha = Math.max(alpha, value);
 
-                if (beta <= alpha) break;
-            }
-
-            if (depthRemaining == depthBound-1) {
-                System.out.println("first child of root");
-                if (value > bestScore) {
-                    System.out.println("value" +value);System.out.println("bestscore" +bestScore);
-                    bestMove = node.firstMove;
-                    bestScore = value;
+                if (beta <= alpha) {
+                    prunes++;
+                    break;
                 }
+
             }
             return value;
 
@@ -131,16 +138,26 @@ public class T800 extends Agent {
 
             while (node.moreChilds()) {
 
-                child = node.nextChild(firstMove);
+                child = node.nextChild(node.firstMove);
 
-                value = Math.min(value, alphaBeta(child, depthRemaining-1, a, b, true, firstMove));
+
+
+
+
+                value = Math.min(value, alphaBeta(child, depthRemaining-1, alpha, beta, true, firstMove));
                 beta = Math.min(beta, value);
-                if (beta <= alpha) break;
+
+                if (beta <= alpha) {
+                    prunes ++;
+                    break;
+                }
             }
-            if (depthRemaining == depthBound-1) {
-                System.out.println("first child of root");
+            // once recursion has ended, if we are at a child of the root node, check its evaluation value against the
+            // best yet found, and update the bestScore and bestMove if appropriate
+            if (depthRemaining == Config.getDepthCutoff() -1) {
+
                 if (value > bestScore) {
-                    System.out.println("value" +value);System.out.println("bestscore" +bestScore);
+
                     bestMove = node.firstMove;
                     bestScore = value;
                 }
@@ -148,10 +165,4 @@ public class T800 extends Agent {
             return value;
         }
     }
-    private void loadConfig(String filePath) {
-
-
-    }
-
-
 }

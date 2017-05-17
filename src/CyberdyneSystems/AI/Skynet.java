@@ -18,50 +18,14 @@ import CyberdyneSystems.generic.Board;
  */
 public class Skynet {
 
-    private static final Skynet INSTANCE =
-            new Skynet(2,1,1.5f,0.75f, 2,10,10,1,0.5f);
-
-    private static float W1, W1_e, W2, W2_e, W2x, W3, W3_e, W4f,W4n, W4f_e,W4n_e;
-
     /**
-     * Initialises all the weightings for the evaluation function, need to get rid of singleton pattern during machine
-     * learning
-     * @param w1 weighting on AI's 'forwardness'
-     * @param w1_e weighting on enemies 'forwardness'
-     * @param w2 weighting on AI's 'blockedness'
-     * @param w2_e weighting on enemies 'blockedness'
-     * @param w3 weighting on AI's number of pieces
-     * @param w3_e weighting on enemies number of pieces
-     * @param w4f weighting on AI's 1st move being forward
-     * @param w4n weighting on AI's 1st move not being forward
-
-     */
-    private Skynet (float w1, float w1_e, float w2, float w2_e, float w2x, float w3, float w3_e, float w4f, float w4n) {
-
-        W1 = w1;
-        W1_e = w1_e;
-        W2 = w2;
-        W2_e = w2_e;
-        W2x = w2x;
-        W3 = w3;
-        W3_e = w3_e;
-        W4f = w4f;
-        W4n = w4n;
-    }
-
-    public static Skynet getSkynet() {
-        return INSTANCE;
-    }
-
-    /**
-     *
      * @param firstMove
      * @param me
      * @param enemy
      * @return
      */
-    public float evaluate(Move firstMove, Agent me, Agent enemy) {
-        float e1, e1e, e2, e2e, e3, e3e, e4;
+    public static float evaluate(Move firstMove, Agent me, Agent enemy) {
+        float e1, e1e, e2, e2e, e3, e3e, e4, E=0; // evaluation values
 
         e1  = E1(me);
         e1e = E1(enemy);
@@ -70,8 +34,15 @@ public class Skynet {
         e3  = E3(me);
         e3e = E3(enemy);
         e4 = E4(firstMove, me);
-        float E= W1*e1 - W1_e*e1e - W2*e2 + W2_e*e2e  + W3*e3 - W3_e*e3e + e4;
-        return W1*e1 - W1_e*e1e - W2*e2 + W2_e*e2e  + W3*e3 - W3_e*e3e + e4;
+
+        E += Config.getW1()*e1 - Config.getW1e()*e1e; // AI forwardness - opponent  (weighted)
+ //System.out.println("1 " +e1+", 1e "+e1e+", 2 "+e2+", 2e "+e2e+", 3 "+e3+", 3e "+e3e+", 4 "+e4);
+
+        E += Config.getW2e() - e2e/Config.getW2()*e2; // Opponent blockedness - AI's(weighted)
+        E += Config.getW3e() - e3e/Config.getW3()*e3; // AI's first move modifier   (internally weighted)
+        E += e4;
+
+        return E;
     }
 
     /**
@@ -84,9 +55,9 @@ public class Skynet {
 
         for (i=0; i < agent.numPieces(); i++) {
             if (agent.player == Board.H) {
-                E += agent.getPiece(i)[Agent.i];
+                E += agent.getPiece(i)[Agent.i] - Board.getSize();
             } else {
-                E += agent.getPiece(i)[Agent.j];
+                E += agent.getPiece(i)[Agent.j] - Board.getSize();
             }
         }
         return E;
@@ -107,7 +78,7 @@ public class Skynet {
             if (agent.board.canMoveTo(agent.getPiece(i)[Agent.i] + 1, agent.getPiece(i)[Agent.j], agent.player)) {
                 // if this is a forward block
                 if (agent.player == Board.H) {
-                    E += W2x;
+                    E += Config.getW2x();
                 } else {
                     E++;
                 }
@@ -115,7 +86,7 @@ public class Skynet {
             // same deal up
             if (agent.board.canMoveTo(agent.getPiece(i)[Agent.i], agent.getPiece(i)[Agent.j] + 1, agent.player)) {
                 if (agent.player == Board.V) {
-                    E += W2x;
+                    E += Config.getW2x();
                 } else {
                     E++;
                 }
@@ -133,6 +104,7 @@ public class Skynet {
                 }
             }
         }
+
         return E;
     }
 
@@ -152,10 +124,10 @@ public class Skynet {
         if((player.player == 'H' && firstMove.d == Move.Direction.RIGHT) ||
                 (player.player == 'V' && firstMove.d == Move.Direction.UP)) {
 
-            return W4f;
+            return Config.getW4f();
 
         } else {
-            return W4n;
+            return Config.getW4n();
         }
     }
 }

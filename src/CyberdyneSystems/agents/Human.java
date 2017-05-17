@@ -125,7 +125,7 @@ public class Human extends Agent  {
             for (int i=0; i < Board.getSize(); i++) {
                 // make sure indexes get printed for my pieces
                 if (board.layout[i][j] == player) {
-                    System.out.print(" "+ getPieceIndex(i,j)+ " ");
+                    //System.out.print(" "+ getPieceIndex(i,j)+ " ");
                 } else {
                     System.out.print(" "+ board.layout[i][j]+ " ");
                 }

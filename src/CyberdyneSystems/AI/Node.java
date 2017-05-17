@@ -1,6 +1,7 @@
 
         package CyberdyneSystems.AI;
 
+        import CyberdyneSystems.agents.T800;
         import CyberdyneSystems.generic.Agent;
         import CyberdyneSystems.generic.Board;
         import aiproj.slider.Move;
@@ -14,12 +15,12 @@
  */
 public class Node {
 
-    private int numChilds=0, numLegalMoves;
+    public int numChilds=0, numLegalMoves;
     private byte p_1, p_2;    // p_1 is the piece index, p_2 is how many directions for that index piece have been explored
-    public Move firstMove; // the move made to get to this node
-
+    public Move firstMove;
     public Agent playerState; // the state of the player that is making the next move, switches between the AI agent and
     public Agent otherAgent;  // could be either the AI or opponent depending on min/max layer
+
 
     public Node(Agent agent, Move first) {
         p_1 = 0;
@@ -76,12 +77,19 @@ public class Node {
      */
     public Node nextChild(Move first) {
 
+        T800.expanded ++;
+
+        Node child;
         final byte U = 0, R = 1, L = 2, D = 3; // direction values for finding next nodes
 
         // return null if all children have been explored
         if (numChilds >= numLegalMoves) {
+            System.out.println("**************************************");
             return null;
         }
+
+
+
         // initialise the agent for the next node, once we find a move we will update it's layout and create the node
         Agent newAgent = new Agent();
         newAgent.enemy = new Agent();
@@ -99,147 +107,163 @@ public class Node {
 
         // using p_1 and p_2 we can find the next legal move
         while (true) {
+
+
             // first check UP
             if (p_2 == U) {
                 if (playerState.board.canMoveTo (playerState.getPiece(p_1)[Agent.i],
                                                 playerState.getPiece(p_1)[Agent.j] + 1, playerState.player)) {
 
-                    // if up is a legal move, make the move using the new enemy agent (since each child swaps enemy
-                    // and player state, the child's enemy agent is the one making the move from this state
+                    // in the node being created enemy is the agent making this move, so it needs to drive changes here
                     newAgent.enemy.makeMove(Move.Direction.UP, p_1);
 
-                    // increment the direction value for next time and return the new child node
-                    numChilds++;
-                    p_2++;
-
-                    // give the enemy agent to the next node the new state's layout and pieces
+                    // give the updated board to the newAgent (playerState in next node)
                     newAgent.giveBoard(newAgent.enemy.board.layout);
                     newAgent.givePieces();
 
-                    // this is the child of the root node, set firstMove for this branch
-                    if (first == null){
-                        return new Node (newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
+                    if (first == null) {
+                        child = new Node(newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
                                 playerState.getPiece(p_1)[Agent.j], Move.Direction.UP));
-
-                    // otherwise just pass firstMove down
                     } else {
-                        return new Node (newAgent, firstMove);
+                        child = new Node(newAgent, first);
                     }
+                    // increment the direction value for next time and return
+                    p_2++;
+                    numChilds++;
 
-                    // if not an allowed move just increment p_2 and continue
+                    return child;
+
+                // increment the direction index if UP is not allowed
                 } else {
                     p_2++;
                 }
             }
-            // check RIGHT, logic similar to before, different direction
+            // check RIGHT
             if (p_2 == R) {
-
-                if (playerState.board.canMoveTo((int)playerState.getPiece(p_1)[Agent.i]+1,
+                if (playerState.board.canMoveTo(playerState.getPiece(p_1)[Agent.i] + 1,
                         playerState.getPiece(p_1)[Agent.j], playerState.player)) {
 
+             /*       // if this is the first move, set firstMove
+                    if (first == null) {
+                        firstMove = new Move(playerState.getPiece(p_1)[Agent.i], playerState.getPiece(p_1)[Agent.j],
+                                Move.Direction.RIGHT);
+                    }
+*/
                     newAgent.enemy.makeMove(Move.Direction.RIGHT, p_1);
-                    newAgent.enemy.givePieces();
+
+                    // give the updated board to the newAgent (playerState in next node)
+                    newAgent.giveBoard(newAgent.enemy.board.layout);
+                    newAgent.givePieces();
+
+                    if (first == null) {
+                        child = new Node(newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
+                                playerState.getPiece(p_1)[Agent.j], Move.Direction.RIGHT));
+                    } else {
+                        child = new Node(newAgent, first);
+                    }
 
                     // increment the direction value for next time and return
                     p_2++;
                     numChilds++;
 
-                    // give the enemy agent to the next node the new state's layout and pieces
-                    newAgent.giveBoard(newAgent.enemy.board.layout);
-                    newAgent.givePieces();
+                    return child;
 
-                    // this is the child of the root node, set firstMove for this branch
-                    if (first == null){
-                        return new Node (newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
-                                playerState.getPiece(p_1)[Agent.j], Move.Direction.RIGHT));
-
-                    // otherwise just pass firstMove down
-                    } else {
-                        return new Node (newAgent, firstMove);
-                    }
-                // if this is illegal increment the move indexer p_2
+                // increment the direction index if RIGHT is not allowed
                 } else {
                     p_2++;
                 }
 
             }
-            // check LEFT, if the player is H, just increment p_2 so it tries down in stead
+            // check LEFT, if the player is H, just increment p_2 and continue to DOWN
             if (p_2 == L) {
 
                 if (playerState.player == Board.H) {
                     p_2++;
+
                 } else {
                     if (playerState.board.canMoveTo(playerState.getPiece(p_1)[Agent.i] - 1,
                             playerState.getPiece(p_1)[Agent.j], playerState.player)) {
 
-
+          /*              // if this is the first move, set firstMove
+                        if (first == null) {
+                            firstMove = new Move(playerState.getPiece(p_1)[Agent.i], playerState.getPiece(p_1)[Agent.j],
+                                    Move.Direction.LEFT);
+                        }
+                        */
                         newAgent.enemy.makeMove(Move.Direction.LEFT, p_1);
 
-                        // this is the last move for given piece at p_1, increment p_1 and numChilds, reset p_2 and return
-                        p_2 = 0;
-                        p_1++;
-                        numChilds++;
-                        // give the enemy agent to the next node the new state's layout and pieces
+
+
+                        // give the updated board to the newAgent (playerState in next node)
                         newAgent.giveBoard(newAgent.enemy.board.layout);
                         newAgent.givePieces();
 
-                        // this is the child of the root node, set firstMove for this branch
-                        if (first == null){
-                            return new Node (newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
-                                    playerState.getPiece(p_1)[Agent.j], Move.Direction.LEFT));
 
-                        // otherwise just pass firstMove down
+
+                        if (first == null) {
+                            child = new Node(newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
+                                    playerState.getPiece(p_1)[Agent.j], Move.Direction.LEFT));
                         } else {
-                            return new Node (newAgent, firstMove);
+                            child = new Node(newAgent, first);
                         }
 
-                    // if left is not allowed, and player is V, reset p_2 and increment the index
+                        // since V cant move down, reset p_2 to 0 and increment p_1
+                        p_2 = 0;
+                        p_1++;
+                        numChilds++;
+
+                        return child;
+
+                    // if LEFT is not allowed, reset p_2 and increment p_1
                     } else {
                         p_1++;
                         p_2 = 0;
                     }
                 }
             }
-            // check DOWN, if player is V, increment p_1 and reset p_2 and continue to next loop step
+            // check DOWN, V should not be able to get here, check just in case and increment/reset their p values
             if (p_2 == D) {
 
                 if (playerState.player == Board.V) {
+                    // shouldn't get here
                     p_1++;
                     p_2 = 0;
+
                 } else {
                     if (playerState.board.canMoveTo(playerState.getPiece(p_1)[Agent.i],
                             playerState.getPiece(p_1)[Agent.j] - 1, playerState.player)) {
 
+                 /*       // if this is the first move, set firstMove
+                        if (first == null) {
+                            firstMove = new Move(playerState.getPiece(p_1)[Agent.i], playerState.getPiece(p_1)[Agent.j],
+                                    Move.Direction.DOWN);
+                        }
+*/
                         newAgent.enemy.makeMove(Move.Direction.DOWN, p_1);
-
-
-                        // this is the last move for given piece at p_1, increment p_1 and numChilds, reset p_2
-                        p_2 = 0;
-                        p_1++;
-                        numChilds++;
 
                         // give the enemy agent to the next node the new state's layout and pieces
                         newAgent.giveBoard(newAgent.enemy.board.layout);
                         newAgent.givePieces();
 
-                        // this is the child of the root node, set firstMove for this branch
-                        if (firstMove == null){
-                            return new Node (newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
+                        if (first == null) {
+                            child = new Node(newAgent, new Move(playerState.getPiece(p_1)[Agent.i],
                                     playerState.getPiece(p_1)[Agent.j], Move.Direction.DOWN));
-
-                        // otherwise just pass firstMove down
                         } else {
-                            return new Node (newAgent, firstMove);
+                            child = new Node(newAgent, first);
                         }
+                        // this is the last move for given piece at p_1, increment p_1 and reset p_2
+                        p_2 = 0;
+                        p_1++;
+                        numChilds++;
+                        return child;
 
+                    // if not allowed, increment/ reset p values and continue loop
                     } else {
-                        // Otherwise increment p_1, reset p_2 and continue
                         p_1++;
                         p_2 = 0;
                     }
                 }
             }
-            // if we get here before returning, the loop will continue until a child is found
         }
     }
 

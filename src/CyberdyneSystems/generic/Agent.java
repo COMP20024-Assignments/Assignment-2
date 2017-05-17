@@ -75,7 +75,10 @@ public class Agent implements SliderPlayer {
 
     public byte[] getPiece(int index) {
 
-        if (index >= pieces.size()) return null;
+        if (index >= pieces.size()) {
+            System.out.println(index+" im a dirty dog -dip '17 "+pieces.size());
+            return null;
+        }
         return pieces.get(index);
     }
 
@@ -83,6 +86,9 @@ public class Agent implements SliderPlayer {
 
         // be careful to only do this if it's legal
         Move myMove = new Move(pieces.get(index)[i], pieces.get(index)[j], direction);
+   //     board.printLayout();
+  //  System.out.println("updating piece: "+pieces.get(index)[i]+" "+pieces.get(index)[j]+ " direction: "+direction);
+
 
         if (pieces.get(index)[i] == Board.getSize() || pieces.get(index)[j] == Board.getSize()) {
             pieces.remove(index);
@@ -100,14 +106,43 @@ public class Agent implements SliderPlayer {
             }
         }
         board.update(myMove, player);
+
+//        System.out.println("updated");
+//        board.printLayout();
+//        System.out.println("\n\n");
         return myMove;
     }
 
-    protected int getPieceIndex(int x, int y) {
-        for (int i = 0; i < pieces.size(); i++) {
-            if (pieces.get(i)[i] == x && pieces.get(i)[j] == y) return i;
+    protected void movePiece(Move move) {
+
+        for (int index = 0; index<numPieces(); index++) {
+
+            if ((pieces.get(index)[i] == move.i) && (pieces.get(index)[j] == move.j)) {
+
+                switch (move.d) {
+                    case DOWN:
+                        pieces.get(index)[j]--;
+                        return;
+                    case RIGHT:
+                        if (player == Board.H && pieces.get(index)[i]+1 == Board.getSize()) {
+                            pieces.remove(index);
+                        } else {
+                            pieces.get(index)[i]++;
+                        }
+                        return;
+                    case UP:
+                        if (player == Board.V && pieces.get(index)[j]+1 == Board.getSize()) {
+                            pieces.remove(index);
+                        } else {
+                        pieces.get(index)[j]++;
+                        }
+                        return;
+                    case LEFT:
+                        pieces.get(index)[i]--;
+                        return;
+                }
+            }
         }
-        return -1; // shouldnt get here if x and y are the coordinates for a piece I own.
     }
 
 
@@ -122,5 +157,13 @@ public class Agent implements SliderPlayer {
      */
     public Move move(){
         return null;
+    }
+
+
+public void printPieces(){
+    for (byte[] piece : pieces) {
+        System.out.print("("+piece[i]+", "+piece[j]+")");
+    }
+    System.out.println();
     }
 }
