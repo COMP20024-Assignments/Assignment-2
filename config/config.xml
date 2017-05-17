@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config revision="1.0">
+
+    <depthConfig>
+        <min>3</min>
+        <max>8</max>
+        <heapSize>1000</heapSize>
+    </depthConfig>
+
+    <forwardness>
+        <agent>10</agent>
+        <opponent>10</opponent>
+    </forwardness>
+
+    <blockedness>
+        <agent>2</agent>
+        <opponent>100</opponent>
+        <fwdMultiplier>1.5</fwdMultiplier>
+    </blockedness>
+
+    <emptyness>
+        <agent>4</agent>
+        <opponent>2</opponent>
+    </emptyness>
+
+    <firstFwd>
+        <agent>2</agent>
+        <opponent>-1</opponent>
+    </firstFwd>
+
+    <firstN>
+        <agent>-1</agent>
+        <opponent>1</opponent>
+    </firstN>
+
+</config>

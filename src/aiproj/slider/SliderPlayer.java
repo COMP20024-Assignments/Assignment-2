@@ -19,10 +19,10 @@ public interface SliderPlayer {
 
     /**
      * Prepare a newly created SliderPlayer to play a game of Slideron a given
-     * board, as a given player.
+     * layout, as a given player.
      *
-     * @param dimension The width and height of the board in cells
-     * @param board A string representation of the initial state of the board,
+     * @param dimension The width and height of the layout in cells
+     * @param board A string representation of the initial state of the layout,
      * as described in the part B specification
      * @param player 'H' or 'V', corresponding to which pieces the player will
      * control for this game ('H' = Horizontal, 'V' = Vertical)
@@ -32,7 +32,7 @@ public interface SliderPlayer {
     /**
      * Notify the player of the last move made by their opponent. In response to
      * this method, your player should update its internal representation of the
-     * board state to reflect the result of the move made by the opponent.
+     * layout state to reflect the result of the move made by the opponent.
      *
      * @param move A Move object representing the previous move made by the
      * opponent, which may be null (indicating a pass). Also, before the first
@@ -50,7 +50,7 @@ public interface SliderPlayer {
      * state of the game. If there are no legal moves, return null (pass).
      *
      * Before returning your move, you should also update your internal
-     * representation of the board to reflect the result of the move you are
+     * representation of the layout to reflect the result of the move you are
      * about to make.
      *
      * @return a Move object representing the move you would like to make

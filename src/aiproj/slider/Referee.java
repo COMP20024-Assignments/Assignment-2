@@ -12,8 +12,8 @@ package aiproj.slider;
 /**
  * Referee class: Driver for a game of Slider
  * Run this class on the command line using a command like:
- * java aiproj.slider.Referee 6 your.package.PlayerName your.package.PlayerName
- * to play your program PlayerName against itself on a board of size N=6
+ * java aiproj.aiproj.slider.Referee 6 your.package.PlayerName your.package.PlayerName
+ * to play your program PlayerName against itself on a layout of size N=6
  * See the specification for more detialed instructions
  */
 public class Referee {
@@ -28,10 +28,10 @@ public class Referee {
 
 
 		/* * * *
-		 * then, set up the board and initialise the players
+		 * then, set up the layout and initialise the players
 		 */
 
-        // create a new board
+        // create a new layout
         Board board = new Board(options.dimension);
 
         // set up timer and time array for profiling
@@ -70,7 +70,7 @@ public class Referee {
         while (!board.finished()) {
 
             // delay
-            sleep(options.delay);
+          //  sleep(options.delay);
 
             // calculate and time move
             timer.start();
@@ -111,7 +111,7 @@ public class Referee {
         }
     }
 
-    /** Helper function for rendering a board */
+    /** Helper function for rendering a layout */
     private static void render(Board board) {
         System.out.println(board);
     }
@@ -131,7 +131,7 @@ public class Referee {
     private static class Options {
 
         public final int delay;				 // time in ms to delay rendering
-        public final int dimension;			 // dimension of board to play on
+        public final int dimension;			 // dimension of layout to play on
         public final Class playerH, playerV; // class names of players to play
 
         public Options(String[] args) {
@@ -148,7 +148,7 @@ public class Referee {
                 this.delay = 0; // default to zero (which will be ignored)
             }
 
-            // check dimension of board
+            // check dimension of layout
             this.dimension = Integer.parseInt(args[0]);
             if (! (dimension > 3) ) {
                 System.err.println("invalid dimension: should be > 3");
@@ -173,7 +173,7 @@ public class Referee {
 
         static void printUsageInfoAndExit() {
             System.err.println("usage: java Referee N playerH playerV [delay]");
-            System.err.println("       N - dimension of board to use (N > 3)");
+            System.err.println("       N - dimension of layout to use (N > 3)");
             System.err.println(" playerH - fully qualified name of H player");
             System.err.println(" playerV - fully qualified name of V player");
             System.err.println("   delay - (optional) ms delay between turns");
@@ -190,7 +190,7 @@ public class Referee {
     }
 
     /**
-     * Referee's (simplified) internal representation of the board,
+     * Referee's (simplified) internal representation of the layout,
      * handles validation and rendering
      */
     private static class Board {
@@ -246,7 +246,7 @@ public class Referee {
             }
         }
 
-        /** represent a board as text for rendering */
+        /** represent a layout as text for rendering */
         private static final char[] SYMBOLS = {'+', 'B', 'H', 'V'};
         public String toString(){
             StringBuilder s = new StringBuilder(2 * n * n);
@@ -261,7 +261,7 @@ public class Referee {
             return s.toString();
         }
 
-        /** validate a move and change the board state */
+        /** validate a move and change the layout state */
         public void move(Move move, Piece turn) throws IllegalMoveException {
             // detect null move (pass)
             if (move == null) {
@@ -309,7 +309,7 @@ public class Referee {
                 case LEFT:	toi--; break;
             }
 
-            // are we advancing a piece off the board?
+            // are we advancing a piece off the layout?
             if (piece == Piece.HSLIDER && toi == n) {
                 grid[move.i][move.j] = Piece.BLANK;
                 hsliders--;
@@ -321,9 +321,9 @@ public class Referee {
                 return;
             }
 
-            // if not, is the position we are moving to on the board?
+            // if not, is the position we are moving to on the layout?
             if (toj < 0 || toj >= n || toi < 0 || toi >= n) {
-                throw new IllegalMoveException("can't move off the board!");
+                throw new IllegalMoveException("can't move off the layout!");
             }
 
             // is the position we are moving to already occupied?
@@ -373,7 +373,7 @@ public class Referee {
         }
     }
 
-    /** Enumeration of all of the possible states of a board position */
+    /** Enumeration of all of the possible states of a layout position */
     private static enum Piece { BLANK, BLOCK, HSLIDER, VSLIDER, }
 
     /** Simple exception describing a move that fails validation */
